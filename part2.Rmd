@@ -1,0 +1,173 @@
+---
+title: "part2"
+author: "Lulu"
+date: "7/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project Descriptions
+
+1. Load the ToothGrowth data and perform some basic exploratory data analyses
+2. Provide a basic summary of the data.
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by 
+supp and dose.
+4. State your conclusions and the assumptions needed for your conclusions.
+
+## Point 1
+1. Provide a basic summary of the data.
+
+```{r, echo=FALSE}
+str(ToothGrowth)
+```
+
+ToothGrowth is a "data.frame" containing 60 observations of 3 variables: "len", 
+numeric; "supp", factor; "dose", numeric. 
+There are two supplements: VC and OJ. Each one contains three doses at 0.5, 
+1.0, and 2.0. There are 10 observations for each supp at each dose. 
+
+```{r assign data, echo=FALSE}
+# Assign ToothGrowth to a new variable tg
+tg <- ToothGrowth
+# Convert ToothGrowth$supp to character instead of factor
+tg$supp <- as.character(tg$supp)
+# Assign all VC and OJ to vc and oj
+vc <- subset(tg,supp == "VC")
+oj <- subset(tg, supp == "OJ")
+```
+
+```{r statistics, echo=FALSE}
+# Load library
+library(dplyr)
+# Calculate means
+mns <- tg%>%group_by(supp, dose)%>%summarise(mean(len))
+mns
+sds <- tg%>%group_by(supp, dose)%>%summarise(sd(len))
+sds
+```
+
+As shown in the table, higher doses of VC or OJ induced more tooth growth. 
+Maximum average of tooth growth 26.14 was observed at VC dose of 2.0. 
+
+```{r plots, echo=FALSE}
+# Make a plot of one row and 2 columns
+par(mfrow=c(1,2), mar=c(4,4,2,1))
+
+# Make boxplots of len for different doses of VC and OJ
+boxplot(len~dose, vc, xlab="dose", ylab="ToothGrowth", main="VC", ylim=c(2,35))
+boxplot(len~dose, oj, xlab="dose", ylab="ToothGrowth", main="OJ", ylim=c(2,35))
+```
+
+## Point 3
+Use confidence intervals and/or hypothesis tests to compare tooth growth by supp
+and dose.
+
+```{r set up parameters, echo=FALSE}
+vc_half <- subset(vc, dose==0.5)
+vc_1 <- subset(vc, dose==1)
+vc_2 <- subset(vc, dose==2)
+oj_half <- subset(oj, dose==0.5)
+oj_1 <- subset(oj, dose==1)
+oj_2 <- subset(oj, dose==2)
+```
+1. Compare tooth growth associated with different doses for same supplement. 
+
+1.1 Run t test to compare vc_half and vc_1. 
+Hypothesis H0: same tooth growth at vc_1 and vc_half; Ha: more tooth growth at 
+vc_1 compared to vc_half.
+Assumes same variance in two groups.
+
+```{r}
+t.test(vc_1$len-vc_half$len, alternative="greater")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+vc_1$len-vc_half$len is 6.16418 to Inf. Therefore, more tooth growth is 
+associated with vc_1 compared to vc_half. 
+
+1.2 Run t test to compare vc_2 and vc_1. 
+Hypothesis H0: same tooth growth at vc_2 and vc_1; Ha: more tooth growth at 
+vc_2 compared to vc_1.
+Assumes same variance in two groups.
+
+```{r}
+t.test(vc_2$len-vc_1$len, alternative="greater")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+vc_2$len-vc_1$len is 6.157075 to Inf. Therefore, more tooth growth is 
+associated with vc_2 compared to vc_1. 
+
+1.3 Run t test to compare oj_half and oj_1. 
+Hypothesis H0: same tooth growth at oj_1 and oj_half; Ha: more tooth growth 
+at oj_1 compared to oj_half.
+Assumes same variance in two groups.
+
+```{r}
+t.test(oj_1$len-oj_half$len, alternative="greater")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+oj_1$len-oj_half$len is 5.300497 to Inf. Therefore, more tooth growth is 
+associated with oj_1 compared to oj_half. 
+
+1.4 Run t test to compare oj_2 and oj_1. 
+Hypothesis H0: same tooth growth at oj_2 and oj_1; Ha: more tooth growth at 
+oj_2 compared to oj_1.
+Assumes same variance in two groups.
+
+```{r}
+t.test(oj_2$len-oj_1$len, alternative="greater")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+oj_2$len-oj_1$len is 0.1908169 to Inf. Therefore, more tooth growth is 
+associated with oj_2 compared to oj_1. 
+
+Conclusion: more tooth growth is associated with higher doses for the same 
+supplement. 
+
+2. Compare tooth growth associated with different supplement at the same doses. 
+
+2.1 Run t test to compare vc_half and oj_half. 
+Hypothesis H0: same tooth growth at vc_half and oj_half; Ha: more tooth growth 
+at oj_half compared to vc_half.
+Assumes same variance in two groups.
+
+```{r}
+t.test(oj_half$len-vc_half$len, alternative="greater")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+oj_half$len-vc_half$len is 2.019552 to Inf. Therefore, more tooth growth is 
+ssociated with oj_half compared to vc_half. 
+
+2.2 Run t test to compare vc_1 and oj_1. 
+Hypothesis H0: same tooth growth at vc_1 and oj_1; Ha: more tooth growth at 
+oj_1 compared to vc_1.
+Assumes same variance in two groups.
+
+```{r}
+t.test(oj_1$len-vc_1$len, alternative="greater")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+oj_1$len-vc_1$len is 2.706401 to Inf. Therefore, more tooth growth is 
+associated with oj_1 compared to vc_1. 
+
+3.3 Run t test to compare vc_2 and oj_2. 
+Hypothesis H0: same tooth growth at vc_2 and oj_2; Ha: different tooth growth 
+at vc_2 compared to oj_2.
+Assumes same variance in two groups.
+
+```{r}
+# Assumes same variance in two groups
+t.test(vc_2$len-oj_2$len, alternative="two.sided")
+```
+
+One sample t-test results show the 95 percent confidence interval of 
+vc_2$len-oj_2$len is -4.168976 to 4.328976. Therefore, accepting null hopothesis 
+that same tooth growth at vc_2 and oj_2. 

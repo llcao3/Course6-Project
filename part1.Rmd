@@ -1,0 +1,106 @@
+---
+title: "Statistical Inference Project Part 1"
+author: "Lulu"
+date: "6/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project Descriptions
+
+In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. Set lambda = 0.2 for all of the simulations. You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.
+
+Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials. 
+
+1. Show the sample mean and compare it to the theoretical mean of the distribution.
+2. Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+3. Show that the distribution is approximately normal.
+
+```{r parameters}
+## Set up parameters
+lambda <- 0.2
+n <- 40
+simulations <- 1000
+
+# Set seed for reproduciblity
+set.seed(123)
+
+# Create a vector containing 1000 means of 40 random exponentials. 
+mns <- NULL
+for(i in 1:simulations){mns <- c(mns, mean(rexp(n,lambda)))}
+length(mns)
+```
+
+## Point 1
+Show the sample mean and compare it to the theoretical mean of the distribution.
+
+```{r}
+simulated_mean <- mean(mns)
+simulated_mean
+theoretical_mean <- 1/lambda
+theoretical_mean
+```
+
+```{r visualization, echo=FALSE}
+# Generate a histogram plot for the 1000 means of 40 random exponentials
+hist(mns, prob=TRUE, main="Histogram of 1000 Simulated Means")
+abline(v=simulated_mean, col="darkred", lty=2, lwd=3)
+abline(v=theoretical_mean, col="darkblue", lty=2, lwd=3)
+```
+
+The theoretical mean is 5. The simulated mean is 5.011911. The center of the simulated
+distribution (1000 means of 40 random exponentials) is very close to the theoretical mean. 
+
+## Point 2
+Show how variable the sample is (via variance) and compare it to the theoretical
+variance of the distribution.
+
+```{r}
+simulated_sd <- sd(mns)
+simulated_sd
+theoretical_sd <- (1/lambda)/sqrt(n)
+theoretical_sd
+simulated_variance <- var(mns)
+simulated_variance
+theoretical_variance <- (1/lambda)^2/n
+theoretical_variance
+```
+
+The theoretical_variance is (1/lambda)^2/n = (1/0.2)^2/40 = 0.625. The 
+simulated_variance (1000 means of 40 random expoentials) is 0.6004928 and it is 
+very close to the theoretical variance of the distribution. 
+
+## Point 3
+Show that the distribution is approximately normal.
+
+```{r}
+# Make a plot of two rows and 1 column
+par(mfrow=c(2,1), mar=c(4,4,2,1))
+
+# Create a vector containing 1000 random exponetials
+ex=rexp(1000,lambda)
+
+# Generate a histgram plot for 1000 random exponentials
+hist(ex, prob=TRUE, main="Histogram of 1000 random exponetials")
+
+# Generate a histgram plot for the 1000 means with prob=TRUE for probabilities not counts
+hist(mns, prob=TRUE, main="Histogram of 1000 means")
+
+# Add a density plot line
+lines(density(mns, adjust=2), lty="dotted", col="darkgreen", lwd=3)
+
+# Add a normal distribution line
+x <- seq(2,8, length=1000)
+y <- dnorm(x, mean=mean(mns),sd=sd(mns))
+lines(x,y, lty="dotted", col="darkred", lwd=3)
+
+# Add a legend
+legend(6.5,0.4, legend=c("Density of means","normal distribution"), 
+       col=c("darkgreen", "darkred"),
+       lty=2, lwd=3,cex=0.7)
+```
+
+Compared to the distribution of 1000 random exponentials, the distribution of 1000 means of 40 random exponentials is approximately normal. 
